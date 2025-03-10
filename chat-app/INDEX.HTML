@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Real-time Chat App</title>
+  <style>
+    /* Basic styles for chat */
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f0f0f0;
+    }
+
+    #chat-container {
+      width: 400px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #messages {
+      height: 300px;
+      overflow-y: auto;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div id="chat-container">
+    <div id="messages"></div>
+
+    <!-- Private message input -->
+    <input type="text" id="recipient" placeholder="Recipient username" />
+    <input type="text" id="message-input" placeholder="Type your message..." />
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+    const messageInput = document.getElementById('message-input');
+    const messagesContainer = document.getElementById('messages');
+    const recipientInput = document.getElementById('recipient');
+    const userList = document.getElementById('user-list');
+
+    // Emit message to server on 'Enter'
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter' && messageInput.value) {
+        socket.emit('chat message', messageInput.value);
+        messageInput.value = '';
+      }
+    });
+
+    // Listen for incoming messages
+    socket.on('chat message', (msg) => {
+      const messageElement = document.createElement('p');
+      messageElement.textContent = msg;
+      messagesContainer.appendChild(messageElement);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight; // Scroll to the bottom
+    });
+
+    // Emit private message when "Enter" is pressed
+  recipientInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter' && recipientInput.value && messageInput.value) {
+    const recipient = recipientInput.value;
+    const message = messageInput.value;
+    socket.emit('private message', recipient, message);
+    messageInput.value = '';
+  }
+});
+
+// Listen for the 'user list' event
+socket.on('user list', (users) => {
+  userList.innerHTML = ''; // Clear current list
+  users.forEach((user) => {
+    const userElement = document.createElement('li');
+    userElement.textContent = user;
+    userList.appendChild(userElement);
+  });
+});
+
+<ul id="user-list"></ul>
+
+  </script>
+</body>
+</html>
