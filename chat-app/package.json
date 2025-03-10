@@ -1,13 +1,16 @@
 {
   
-
+  
   "name": "chat-app",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+  
   },
+  "homepage": "https://github.com/Aditya2322/CHAT-APP",
   "keywords": [],
   "author": "",
   "license": "ISC",
